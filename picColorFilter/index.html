@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>filter</title>
+
+	</head>
+	<body>
+		<div style="margin:20px auto;width:1250px;">
+			<canvas id="canvasa" width="600" height="500" style="display:block;float:left;border:solid 1px #ccc;"></canvas>
+			<canvas id="canvasb" width="600" height="500" style="display:block;float:right;border:solid 1px #ccc;"></canvas>
+		</div>
+		<div style="clear:both"></div>
+		<div style="text-align:center;margin-top:50px;font-size:20px">
+			<a href="javascript:greyEffect()">greyEffect</a>
+		</div>
+		<script>
+		var oCanvasa = document.getElementById('canvasa');
+		var contexta = oCanvasa.getContext('2d');
+		var oCanvasb = document.getElementById('canvasb');
+		var contextb = oCanvasb.getContext('2d');
+		window.onload = function(){
+			var oImg = new Image();
+			oImg.src = 'autumn.jpg';
+			oImg.onload = function(){
+				contexta.drawImage(oImg,0,0,oCanvasa.width,oCanvasa.height);
+			};	
+		};
+		function greyEffect(){
+				var imageData = contexta.getImageData(0,0,oCanvasa.width,oCanvasa.height);
+				var pixelData = imageData.data;
+				for(var i = 0; i < oCanvasa.width*oCanvasa.height; i++){
+					var r = pixelData[4*i+0];
+					var g = pixelData[4*i+1];
+					var b = pixelData[4*i+2];
+					var grey = r*0.3+g*0.59+b*0.11;
+					pixelData[4*i+0] = grey;
+					pixelData[4*i+1] = grey;
+					pixelData[4*i+2] = grey;
+				}
+				contextb.putImageData(imageData,0,0,0,0,oCanvasb.width,oCanvasb.height);
+			}
+		</script>
+	</body>
+</html>

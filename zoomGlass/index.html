@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>zoomGlass</title>
+	<script>
+	window.onload = function(){
+		//创建展示画布
+		var oCanvas = document.getElementById('canvasPic');
+		var context = oCanvas.getContext('2d');
+		//创建放大镜的画布
+		var oCanvasGlass = document.getElementById('zoomGlass');
+		var contextGlass = oCanvasGlass.getContext('2d');
+		var oImg = new Image();
+		oImg.src = "image/img.jpg";
+		oCanvas.width = 1152;
+		oCanvas.height = 768;
+		var scale;
+		//判断是否被点击
+		var isMouseDown = false;
+		oImg.onload = function(){
+			oCanvasGlass.width = oImg.width;
+			oCanvasGlass.height = oImg.height;
+			//放大的尺寸
+			scale = oCanvasGlass.width/oCanvas.width;
+			context.drawImage(oImg,0,0,oCanvas.width,oCanvas.height);
+			contextGlass.drawImage(oImg,0,0);
+		};
+		oCanvas.onmousedown = function(e){
+			var point = canvasPos(e.clientX,e.clientY);
+			isMouseDown = true;
+			e.preventDefault();
+			drawWithZoomGlass(true,point);
+		};
+		oCanvas.onmousemove = function(e){
+			if(isMouseDown == true){
+				var point = canvasPos(e.clientX,e.clientY);
+				drawWithZoomGlass(true,point);
+			}
+			e.preventDefault();
+		};
+		oCanvas.onmouseup = function(e){
+			isMouseDown = false;
+			e.preventDefault();
+			drawWithZoomGlass(false);
+		};
+		oCanvas.onmouseout = function(e){
+			isMouseDown = false;
+			e.preventDefault();
+			drawWithZoomGlass(false);
+		};
+		//获得在画布上的坐标
+		function canvasPos(xa,ya){
+			var bbox = oCanvas.getBoundingClientRect();
+			return {x:xa - bbox.left,y:ya - bbox.top};
+		}
+		function drawWithZoomGlass(isZoom,point){
+			context.clearRect(0,0,oCanvas.width,oCanvas.height);
+			context.drawImage(oImg,0,0,oCanvas.width,oCanvas.height);
+			if(isZoom == true){
+				drawZoom(point);
+			} 
+		}
+		function drawZoom(point){
+			//放大镜的半径
+			var mr = 200;
+			//点击的位置在原始图像的位置，oCanvas里放的是缩小的图片
+			var imageX = point.x*scale;
+			var imageY = point.y*scale;
+			//放大镜画布oCanvasGlass在图片的起始位置
+			var sx = imageX - mr;
+			var sy = imageY - mr;
+			//放大镜OcanvasGlass放在原始画布oCanvas的位置
+			var dx = point.x - mr;
+			var dy = point.y - mr;
+			//保存原始画布的上下文
+			context.save();
+
+			//设定剪辑区域
+			context.lineWidth = 10.0;
+			context.strokeStyle = "#069";
+			context.beginPath();
+			context.arc(point.x,point.y,mr,0,Math.PI*2,false);
+			context.stroke();
+			context.clip();
+			//把放大镜的画布画在原始画布被点击的位置，oCanvasGlass里画的是原始图像的大小。
+			context.drawImage(oCanvasGlass,sx,sy,2*mr,2*mr,dx,dy,2*mr,2*mr);
+			
+			//恢复原始画布的上下文
+			context.restore();
+		}
+	}
+	</script>
+</head>
+<body style="background:black">
+	<canvas id ="canvasPic" style="display:block;margin:0 auto;border:1px solid #ccc">
+		您的浏览器尚不支持canvas
+	</canvas>
+	<canvas id="zoomGlass" style="display:none;"></canvas>
+</body>
+</html>

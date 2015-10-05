@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>zoomPic by canvas</title>
+	<script type="text/javascript">
+	window.onload = function(){
+		var oCanvas = document.getElementById('canvasPic');
+		var context = oCanvas.getContext('2d');
+		var oSlide = document.getElementById('range-scale');
+		var oWaterMarkCanvas = document.getElementById('waterMark');
+		var waterMarkContext = oWaterMarkCanvas.getContext('2d');
+		var oImg = new Image();
+		
+		oCanvas.width = 1152;
+		oCanvas.height = 768;
+		//设置水印的canvas
+		oWaterMarkCanvas.width = 600;
+		oWaterMarkCanvas.height = 100;
+		waterMarkContext.font = "bold 50px Arial";
+		waterMarkContext.lineWidth = "1";
+		waterMarkContext.fillStyle = "rgba(255,255,255,0.5)";
+		waterMarkContext.textBaseline = "middle";
+		waterMarkContext.fillText("yzf",500,50);
+
+		oImg.src = "image/img.jpg";
+		oImg.onload = function(){
+			var scale = oSlide.value;
+			drawImageByScale(scale);
+			oSlide.onmousemove = function(){
+				scale = this.value;
+				drawImageByScale(scale);
+			};
+		};
+		//根据滑动缩放条确定缩放尺寸绘制画布
+		function drawImageByScale(scale){
+			var imageWidth = 1152*scale;
+			var imageHeight = 768*scale;
+			var dx = oCanvas.width/2 - imageWidth/2;
+			var dy = oCanvas.height/2 - imageHeight/2;
+			//清空画布
+			context.clearRect(0,0,oCanvas.width,oCanvas.height);
+			//把放大或缩小的图像绘制到canvas画布的dx,dy位置，放大的会被画布裁剪
+			context.drawImage(oImg,dx,dy,imageWidth,imageHeight);
+			//绘制水印的位置
+			context.drawImage(oWaterMarkCanvas,oCanvas.width - oWaterMarkCanvas.width,oCanvas.height - oWaterMarkCanvas.height);
+		}
+		
+	};
+	</script>
+</head>
+<body style="background-color:black">
+	<canvas id ="canvasPic" style="display:block;margin:0 auto;border:1px solid #ccc">
+		您的浏览器尚不支持canvas
+	</canvas>
+	<input type="range" id="range-scale" min="0.5" max="3.0" step="0.01" value="1.0" style="display:block;margin:20px auto; width:800px">
+	<canvas id="waterMark" style="display:none;margin:0 auto;border:1px solid #ccc">
+		您的浏览器尚不支持canvas
+	</canvas>
+</body>
+</html>
